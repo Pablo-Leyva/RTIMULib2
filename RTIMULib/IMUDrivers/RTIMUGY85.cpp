@@ -158,7 +158,7 @@ void RTIMUGY85::setGyroSampleRate() {
 
 
 void RTIMUGY85::compassInit() {    
-    m_settings->HALWrite(m_accelSlaveAddr, HMC5883L_MODE, 0x0, "Failed to Init ADXL345 HMC5883L");
+    m_settings->HALWrite(m_compassSlaveAddr, HMC5883L_MODE, 0x0, "Failed to Init ADXL345 HMC5883L");
     setCompassRange();
     setCompassSampleRate();
 }
