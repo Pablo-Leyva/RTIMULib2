@@ -143,6 +143,18 @@
 
 #define RTIMULIB_BMX055_MAG_PRESET          "BMX055MagPreset"
 
+//  GY85 settings keys
+
+#define RTIMULIB_GY85_ACCEL_SAMPLERATE      "GY85AccelSampleRate"
+#define RTIMULIB_GY85_ACCEL_FSR             "GY85AccelFsr"
+
+#define RTIMULIB_GY85_GYRO_SAMPLERATE       "GY85GyroSampleRate"
+#define RTIMULIB_GY85_GYRO_BW               "GY85GyroBW"
+#define RTIMULIB_GY85_GYRO_FSR              "GY85GyroFsr"
+
+#define RTIMULIB_GY85_COMPASS_SAMPLERATE    "GY85CompassSampleRate"
+#define RTIMULIB_GY85_COMPASS_FSR           "GY85CompassFsr"
+
 //  Gyro bias keys
 
 #define RTIMULIB_GYRO_BIAS_VALID            "GyroBiasValid"
@@ -350,6 +362,18 @@ public:
     int m_BMX055AccelFsr;                                   // the accel full scale range
 
     int m_BMX055MagPreset;                                  // the mag preset code
+
+    //  GY-85
+
+    int m_GY85AccelSampleRate;                             // the accel sample rate
+    int m_GY85AccelFsr;                                    // the accel full scale range
+
+    int m_GY85GyroSampleRate;                              // the gyro sample rate
+    int m_GY85GyroBW;                                      // the gyro bandwidth code
+    int m_GY85GyroFsr;                                     // the gyro full scale range
+
+    int m_GY85CompassSampleRate;                           // the compass sample rate
+    int m_GY85CompassFsr;                                  // the compass full scale range
 
 private:
     void setBlank();

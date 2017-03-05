@@ -62,6 +62,7 @@ SET(LIBRTIMU_SRCS
     IMUDrivers/RTIMUMPU9250.cpp
     IMUDrivers/RTIMUBMX055.cpp
     IMUDrivers/RTIMUBNO055.cpp
+    IMUDrivers/RTIMUGY85.cpp
     IMUDrivers/RTIMUNull.cpp
     IMUDrivers/RTPressure.cpp
     IMUDrivers/RTPressureBMP180.cpp

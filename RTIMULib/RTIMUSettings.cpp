@@ -34,6 +34,7 @@
 #include "IMUDrivers/RTIMULSM9DS0.h"
 #include "IMUDrivers/RTIMULSM9DS1.h"
 #include "IMUDrivers/RTIMUBMX055.h"
+#include "IMUDrivers/RTIMUGY85.h"
 
 #include "IMUDrivers/RTPressureBMP180.h"
 #include "IMUDrivers/RTPressureLPS25H.h"
@@ -329,12 +330,23 @@ bool RTIMUSettings::discoverIMU(int& imuType, bool& busIsI2C, unsigned char& sla
                 return true;
             }
         }
+
         if (HALRead(BNO055_ADDRESS1, BNO055_WHO_AM_I, 1, &result, "")) {
             if (result == BNO055_ID) {
                 imuType = RTIMU_TYPE_BNO055;
                 slaveAddress = BNO055_ADDRESS1;
                 busIsI2C = true;
                 HAL_INFO("Detected BNO055 at option address\n");
+                return true;
+            }
+        }
+
+        if (HALRead(ADXL345_ADDRESS0, ADXL345_WHO_AM_I, 1, &result, "")) {
+            if (result == ADXL345_ID) {
+                imuType = RTIMU_TYPE_GY85;
+                slaveAddress = ADXL345_ADDRESS0;
+                busIsI2C = true;
+                HAL_INFO("Detected ADXL345 at standard address\n");
                 return true;
             }
         }
@@ -580,6 +592,7 @@ void RTIMUSettings::setDefaults()
 
     m_LSM9DS1CompassSampleRate = LSM9DS1_COMPASS_SAMPLERATE_20;
     m_LSM9DS1CompassFsr = LSM9DS1_COMPASS_FSR_4;
+
     // BMX055 defaults
 
     m_BMX055GyroSampleRate = BMX055_GYRO_SAMPLERATE_100_32;
@@ -589,6 +602,18 @@ void RTIMUSettings::setDefaults()
     m_BMX055AccelFsr = BMX055_ACCEL_FSR_8;
 
     m_BMX055MagPreset = BMX055_MAG_REGULAR;
+
+    // GY85 defaults
+
+    m_GY85AccelSampleRate = ADXL345_SAMPLERATE_100;                             
+    m_GY85AccelFsr = ADXL345_FSR_FULL;                                    
+
+    m_GY85GyroSampleRate = ITG3205_SAMPLERATE_100;                              
+    m_GY85GyroBW = ITG3205_BW_98;                                      
+    m_GY85GyroFsr = ITG3205_FULLSCALE_2000;
+
+    m_GY85CompassSampleRate = HMC5883L_SAMPLERATE_15;
+    m_GY85CompassFsr = HMC5883L_FSR_4;
 }
 
 bool RTIMUSettings::loadSettings()
@@ -894,6 +919,22 @@ bool RTIMUSettings::loadSettings()
         } else if (strcmp(key, RTIMULIB_BMX055_MAG_PRESET) == 0) {
             m_BMX055MagPreset = atoi(val);
 
+        //  GY85 settings
+
+        } else if (strcmp(key, RTIMULIB_GY85_ACCEL_SAMPLERATE) == 0) {
+            m_GY85AccelSampleRate = atoi(val);
+        } else if (strcmp(key, RTIMULIB_GY85_ACCEL_FSR) == 0) {
+            m_GY85AccelFsr = atoi(val);
+        } else if (strcmp(key, RTIMULIB_GY85_GYRO_SAMPLERATE) == 0) {
+            m_GY85GyroSampleRate = atoi(val);
+        } else if (strcmp(key, RTIMULIB_GY85_GYRO_BW) == 0) {
+            m_GY85GyroBW = atoi(val);
+        } else if (strcmp(key, RTIMULIB_GY85_GYRO_FSR) == 0) {
+            m_GY85GyroFsr = atoi(val);
+        } else if (strcmp(key, RTIMULIB_GY85_COMPASS_SAMPLERATE) == 0) {
+            m_GY85CompassSampleRate = atoi(val);
+        } else if (strcmp(key, RTIMULIB_GY85_COMPASS_FSR) == 0) {
+            m_GY85CompassFsr = atoi(val);
         //  Handle unrecognized key
 
         } else {
@@ -934,6 +975,7 @@ bool RTIMUSettings::saveSettings()
     setComment("  8 = STM L3GD20H + LSM303DLHC");
     setComment("  9 = Bosch BMX055");
     setComment("  10 = Bosch BNX055");
+    setComment("  11 = GY85");
     setValue(RTIMULIB_IMU_TYPE, m_imuType);
 
     setBlank();
@@ -1690,6 +1732,94 @@ bool RTIMUSettings::saveSettings()
     setComment("  2 = Enhanced");
     setComment("  3 = High accuracy");
     setValue(RTIMULIB_BMX055_MAG_PRESET, m_BMX055MagPreset);
+
+    //  GY85 settings
+
+    setBlank();
+    setComment("#####################################################################");
+    setComment("");
+    setComment("GY85 settings");
+    setComment("");
+
+    setBlank();
+    setComment("");
+    setComment("Accel sample rate - ");
+    setComment("  06 =    6Hz (   3Hz filter)");
+    setComment("  07 =   12Hz (   6Hz filter)");
+    setComment("  08 =   25Hz (  12Hz filter)");
+    setComment("  09 =   50Hz (  25Hz filter)");
+    setComment("  10 =  100Hz (  50Hz filter)");
+    setComment("  11 =  200Hz ( 100Hz filter)");
+    setComment("  12 =  400Hz ( 200Hz filter)");
+    setComment("  13 =  800Hz ( 400Hz filter)");
+    setComment("  14 = 1600Hz ( 800Hz filter)");
+    setComment("  15 = 3200Hz (1600Hz filter)");
+    setValue(RTIMULIB_GY85_ACCEL_SAMPLERATE, m_GY85AccelSampleRate);
+
+    setBlank();
+    setComment("");
+    setComment("Accel full scale range - ");
+    setComment("  0 = +/- 2g");
+    setComment("  1 = +/- 4g");
+    setComment("  2 = +/- 8g");
+    setComment("  3 = +/- 16g");
+    setComment("  8 = Full Resolution");
+    setValue(RTIMULIB_GY85_ACCEL_FSR, m_GY85AccelFsr);
+
+    setBlank();
+    setComment("");
+    setComment("Gyro sample rate - ");
+    setComment(" 200 =    5Hz ( 1kHz internal sampling rate)");
+    setComment(" 100 =   10Hz ( 1kHz internal sampling rate)");
+    setComment("  40 =   25Hz ( 1kHz internal sampling rate)");
+    setComment("  20 =   50Hz ( 1kHz internal sampling rate)");
+    setComment("  10 =  100Hz ( 1kHz internal sampling rate)");
+    setComment("  04 =  250Hz ( 1kHz internal sampling rate)");
+    setComment("  02 =  500Hz ( 1kHz internal sampling rate)");
+    setComment("  01 = 1000Hz ( 1kHz internal sampling rate)");
+    setValue(RTIMULIB_GY85_GYRO_SAMPLERATE, m_GY85GyroSampleRate);
+
+    setBlank();
+    setComment("");
+    setComment("Gyro bandwidth - ");
+    setComment("  1 = 188 Hz");
+    setComment("  2 =  98 4g");
+    setComment("  3 =  42 8g");
+    setComment("  4 =  20 16g");
+    setComment("  5 =  10 16g");
+    setComment("  6 =   5 16g");
+    setValue(RTIMULIB_GY85_GYRO_BW, m_GY85GyroBW);
+
+    setBlank();
+    setComment("");
+    setComment("Gyro full scale range - ");
+    setComment("  3 = Full Resolution");
+    setValue(RTIMULIB_GY85_GYRO_FSR, m_GY85GyroFsr);
+
+    setBlank();
+    setComment("");
+    setComment("Compass sample rate - ");
+    setComment("  0 =   0.75 Hz");
+    setComment("  1 =   1.5  Hz");
+    setComment("  2 =   3    Hz");
+    setComment("  3 =   7.5  Hz");
+    setComment("  4 =  15    Hz");
+    setComment("  5 =  30    Hz");
+    setComment("  6 =  75    Hz");
+    setValue(RTIMULIB_GY85_COMPASS_SAMPLERATE, m_GY85CompassSampleRate);
+
+    setBlank();
+    setComment("");
+    setComment("Compass range - ");
+    setComment("  0 =  0.88  Ga");
+    setComment("  1 =  1.3   Ga");
+    setComment("  2 =  1.9   Ga");
+    setComment("  3 =  2.5   Ga");
+    setComment("  4 =  4     Ga");
+    setComment("  5 =  4.7   Ga");
+    setComment("  6 =  5.6   Ga");
+    setComment("  7 =  8.1   Ga");
+    setValue(RTIMULIB_GY85_COMPASS_FSR, m_GY85CompassFsr);
 
     fclose(m_fd);
     return true;
