@@ -213,46 +213,55 @@ int RTIMUGY85::IMUGetPollInterval()
 
 bool RTIMUGY85::IMURead()
 {
+    bool valid_sample = true;
+ 
     unsigned char accelData[6];
     unsigned char gyroData[6];
     unsigned char compassData[6];
 
-    m_settings->HALRead(m_accelSlaveAddr,   ADXL345_DATA_X_LSB,  6, accelData,    "Failed to read ADXL345 data");
-    m_settings->HALRead(m_gyroSlaveAddr,    ITG3205_GYRO_XOUT_H, 6, gyroData,     "Failed to read ITG3205 data");
-    //m_settings->HALRead(m_compassSlaveAddr, HMC5883L_DATAX_H,    6, compassData,  "Failed to read HMC5883L data");
-    m_settings->HALRead(m_compassSlaveAddr, HMC5883L_DATAX_H,    2, compassData + 0,  "Failed to read HMC5883L data");
-    m_settings->HALRead(m_compassSlaveAddr, HMC5883L_DATAZ_H,    2, compassData + 4,  "Failed to read HMC5883L data");
-    m_settings->HALRead(m_compassSlaveAddr, HMC5883L_DATAY_H,    2, compassData + 2,  "Failed to read HMC5883L data");
+    if((RTMath::currentUSecsSinceEpoch() - m_imuData.timestamp) < (m_sampleRate*1000000)){
+        valid_sample = false;
+    } else {
+        valid_sample = true;
+        m_imuData.timestamp = RTMath::currentUSecsSinceEpoch(); 
 
-    m_imuData.timestamp = RTMath::currentUSecsSinceEpoch();
+        m_settings->HALRead(m_accelSlaveAddr,   ADXL345_DATA_X_LSB,  6, accelData,    "Failed to read ADXL345 data");
+        m_settings->HALRead(m_gyroSlaveAddr,    ITG3205_GYRO_XOUT_H, 6, gyroData,     "Failed to read ITG3205 data");
+        //m_settings->HALRead(m_compassSlaveAddr, HMC5883L_DATAX_H,    6, compassData,  "Failed to read HMC5883L data");
+        m_settings->HALRead(m_compassSlaveAddr, HMC5883L_DATAX_H,    2, compassData + 0,  "Failed to read HMC5883L data");
+        m_settings->HALRead(m_compassSlaveAddr, HMC5883L_DATAZ_H,    2, compassData + 4,  "Failed to read HMC5883L data");
+        m_settings->HALRead(m_compassSlaveAddr, HMC5883L_DATAY_H,    2, compassData + 2,  "Failed to read HMC5883L data");
 
-    RTMath::convertToVector(accelData,   m_imuData.accel,   m_accelScale,   false);
-    RTMath::convertToVector(gyroData,    m_imuData.gyro,    m_gyroScale,    true);    
-    RTMath::convertToVector(compassData, m_imuData.compass, m_compassScale, true);
+        RTMath::convertToVector(accelData,   m_imuData.accel,   m_accelScale,   false);
+        RTMath::convertToVector(gyroData,    m_imuData.gyro,    m_gyroScale,    true);    
+        RTMath::convertToVector(compassData, m_imuData.compass, m_compassScale, true);
 
-    ////  sort out accel data;
+        m_imuData.timestamp = RTMath::currentUSecsSinceEpoch();
 
-    //m_imuData.accel.setX(-m_imuData.accel.x());
+        ////  sort out accel data;
 
-    ////  sort out gyro axes and correct for bias
+        //m_imuData.accel.setX(-m_imuData.accel.x());
 
-    //m_imuData.gyro.setX(m_imuData.gyro.x());
-    //m_imuData.gyro.setY(-m_imuData.gyro.y());
-    //m_imuData.gyro.setZ(-m_imuData.gyro.z());
+        ////  sort out gyro axes and correct for bias
 
-    ////  sort out compass axes
-    //
-    //m_imuData.compass.setY(-m_imuData.compass.y());
-    //
-    ////  now do standard processing
-    //
-    handleGyroBias();
-    calibrateAverageCompass();
-    calibrateAccel();
-    //
-    //  now update the filter
-    //
-    updateFusion();
-    //
-    return true;
+        //m_imuData.gyro.setX(m_imuData.gyro.x());
+        //m_imuData.gyro.setY(-m_imuData.gyro.y());
+        //m_imuData.gyro.setZ(-m_imuData.gyro.z());
+
+        ////  sort out compass axes
+        //
+        //m_imuData.compass.setY(-m_imuData.compass.y());
+        //
+        ////  now do standard processing
+        //
+        handleGyroBias();
+        calibrateAverageCompass();
+        calibrateAccel();
+        //
+        //  now update the filter
+        //
+        updateFusion();
+        //
+    }
+    return valid_sample;
 }
