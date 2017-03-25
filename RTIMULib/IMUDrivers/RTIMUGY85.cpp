@@ -31,7 +31,7 @@
 
 RTIMUGY85::RTIMUGY85(RTIMUSettings *settings) : RTIMU(settings)
 {
-    m_sampleRate = 100;
+    m_sampleRate = 450;
 }
 
 RTIMUGY85::~RTIMUGY85()
@@ -213,17 +213,25 @@ int RTIMUGY85::IMUGetPollInterval()
 
 bool RTIMUGY85::IMURead()
 {
-    bool valid_sample = true;
+    bool valid_sample = false;
  
     unsigned char accelData[6];
     unsigned char gyroData[6];
     unsigned char compassData[6];
+	
+uint64_t timestamp = RTMath::currentUSecsSinceEpoch();
 
-    if((RTMath::currentUSecsSinceEpoch() - m_imuData.timestamp) < (m_sampleRate*1000000)){
+//	printf("USecsinceEpoch()= %lld \n\r",(uint64_t)RTMath::currentUSecsSinceEpoch());
+//	printf("TimeStamp()= %lld \n\r",(uint64_t)m_imuData.timestamp);
+//	printf("Srate()= %lld \n\r",(uint64_t)((1/(double)m_sampleRate)*1000000));
+//	printf("diff= %lld \n\r",(uint64_t)(RTMath::currentUSecsSinceEpoch() - m_imuData.timestamp));
+    if((timestamp - m_imuData.timestamp) < ((1/(double)m_sampleRate)*1000000)){
         valid_sample = false;
+//	printf("FALSE \r\n");
     } else {
         valid_sample = true;
-        m_imuData.timestamp = RTMath::currentUSecsSinceEpoch(); 
+//	printf("TRUE \r\n");
+//      m_imuData.timestamp = RTMath::currentUSecsSinceEpoch(); 
 
         m_settings->HALRead(m_accelSlaveAddr,   ADXL345_DATA_X_LSB,  6, accelData,    "Failed to read ADXL345 data");
         m_settings->HALRead(m_gyroSlaveAddr,    ITG3205_GYRO_XOUT_H, 6, gyroData,     "Failed to read ITG3205 data");
@@ -236,7 +244,7 @@ bool RTIMUGY85::IMURead()
         RTMath::convertToVector(gyroData,    m_imuData.gyro,    m_gyroScale,    true);    
         RTMath::convertToVector(compassData, m_imuData.compass, m_compassScale, true);
 
-        m_imuData.timestamp = RTMath::currentUSecsSinceEpoch();
+        m_imuData.timestamp = timestamp;
 
         ////  sort out accel data;
 
