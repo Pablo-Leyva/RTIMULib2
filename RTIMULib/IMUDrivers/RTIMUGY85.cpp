@@ -42,11 +42,11 @@ bool RTIMUGY85::IMUInit()
 {
     unsigned char result;
 
-    m_imuData.fusionPoseValid   = false;
-    m_imuData.fusionQPoseValid  = false;
+    m_imuData.fusionPoseValid   = true;
+    m_imuData.fusionQPoseValid  = true;
     m_imuData.gyroValid         = true;
     m_imuData.accelValid        = true;
-    m_imuData.compassValid      = true;
+    m_imuData.compassValid      = false;
     m_imuData.pressureValid     = false;
     m_imuData.temperatureValid  = false;
     m_imuData.humidityValid     = false;
