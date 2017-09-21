@@ -138,6 +138,11 @@ public:
   bool sendMessage(int port, unsigned int messageAddress, unsigned char messageType, 
     unsigned char messageParam, unsigned char *data, int length);
 
+  ///
+  /// @brief      Reads the data
+  ///
+  void readyRead();
+
 protected:
 
     ///

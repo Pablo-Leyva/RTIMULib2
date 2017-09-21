@@ -191,6 +191,44 @@ void RTArduLinkHostNoQt::initSubsystem()
     }
 }
 
+void RTArduLinkHostNoQt::readyRead()
+{
+    QByteArray data;
+    int bytesAvailable;
+    unsigned char *charData;
+    RTARDULINKHOST_PORT *portInfo;
+
+    for (int index = 0; index < RTARDULINKHOST_MAX_PORTS; index++) {
+        portInfo = m_ports + index;
+        if (portInfo->port == NULL)
+            continue;
+
+        if (!portInfo->port->isOpen()) {
+            if (portInfo->open)
+            portInfo->open = false;
+            continue;
+        }
+
+        bytesAvailable = portInfo->port->bytesAvailable();
+        if (bytesAvailable == -1) {                             // port must have closed or had an error
+            closePort(portInfo);
+            continue;
+        }
+        if (bytesAvailable) {
+            data = portInfo->port->readAll();
+            charData = (unsigned char *)data.constData();
+            for (int i = 0; i < data.length(); i++) {
+                if (!RTArduLinkReassemble(&(portInfo->RXFrame), *charData++))
+                    std::cout << "Reassembly error on port " << index << '\n';
+                if (portInfo->RXFrame.complete) {
+                    processReceivedMessage(portInfo);
+                    RTArduLinkRXFrameInit(&(portInfo->RXFrame), &(portInfo->RXFrameBuffer));
+                }
+            }
+        }
+    }
+}
+
 void RTArduLinkHostNoQt::processReceivedMessage(RTARDULINKHOST_PORT *portInfo)
 {
     RTARDULINK_MESSAGE *message;                            // a pointer to the message part of the frame
@@ -321,4 +359,9 @@ void RTArduLinkHostNoQt::closePort(RTARDULINKHOST_PORT *portInfo)
         if (portInfo->open){}
     }
     portInfo->open = false;
+}
+
+void RTArduLinkHostNoQt::processCustomMessage(RTARDULINKHOST_PORT *portInfo, unsigned int messageAddress,
+                                      unsigned char messageType, unsigned char messageParam, unsigned char *data, int dataLength)
+{
 }
