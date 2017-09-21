@@ -92,13 +92,13 @@ public:
   bool begin();
 
   ///
-  /// @brief      Adds adds a new serial port for processing
+  /// @brief      Adds a new serial port for processing
   ///
   /// @param[in]  port       The subsystem port number to assign (0 - (RTARDULINKHOST_MAX_PORTS - 1))
   /// @param[in]  portName   The name of the port to open (eg COM3, /dev/ttyUSB0)
   /// @param[in]  portSpeed  The serial port speed
   ///
-  /// @return     true if the port was added, false if the addPort failed.
+  /// @return     true if the port was added, false if the addPort failed
   ///
   bool addPort(int port, QString portName, BaudRateType portSpeed); // add a serial port
 
@@ -128,6 +128,57 @@ public:
   ///
   bool sendMessage(int port, unsigned int messageAddress, unsigned char messageType, 
     unsigned char messageParam, unsigned char *data, int length);
+
+protected:
+
+    ///
+    /// @brief      Passes a received message to the custom code
+    ///
+    /// @param[in]  portInfo        The port information on which the message was received
+    /// @param[in]  messageAddress  The message address
+    /// @param[in]  messageType     The message type
+    /// @param[in]  messageParam    The message parameter
+    /// @param[in]  data            The data
+    /// @param[in]  dataLength      The data length
+    ///
+    virtual void processCustomMessage(RTARDULINKHOST_PORT *portInfo, unsigned int messageAddress,
+                                      unsigned char messageType, unsigned char messageParam, unsigned char *data, int dataLength);
+
+    ///
+    /// @brief      Is called once per background loop and custom code can
+    ///             perform any regular background processing using this call
+    ///
+    virtual void processBackground() {};
+
+private:
+    ///
+    /// @brief      { function_description }
+    ///
+    void initSubsystem();
+
+    ///
+    /// @brief      Process a received message from a given port
+    ///
+    /// @param      portInfo  The port
+    ///
+    void processReceivedMessage(RTARDULINKHOST_PORT *portInfo);
+
+    ///
+    /// @brief      Sends an identify request
+    ///
+    void sendIdentifyRequest();
+
+    ///
+    /// @brief      Sends a poll request
+    ///
+    void sendPollRequest();
+
+    ///
+    /// @brief      Closes a port
+    ///
+    /// @param      portInfo  The port information
+    ///
+    void closePort(RTARDULINKHOST_PORT *portInfo);
 };
 
 #endif // RTArduLinkHostNoQt_H
