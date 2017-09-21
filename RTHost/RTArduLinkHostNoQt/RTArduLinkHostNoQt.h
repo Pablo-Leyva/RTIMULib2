@@ -103,6 +103,15 @@ public:
   bool addPort(int port, QString portName, BaudRateType portSpeed); // add a serial port
 
   ///
+  /// @brief      Opens a port
+  ///
+  /// @param[in]  port  The port
+  ///
+  /// @return     true if the port was opened, otherwise false
+  ///
+  bool openPort(int port);
+
+  ///
   /// @brief      Deletes a previously added port at index port
   ///
   /// @param[in]  port  The port to detele
@@ -150,9 +159,12 @@ protected:
     ///
     virtual void processBackground() {};
 
+    RTARDULINKHOST_SUBSYSTEM m_subsystem[RTARDULINKHOST_MAX_PORTS][RTARDULINK_ADDRESSES];   // the subsystem array
+    RTARDULINKHOST_PORT m_ports[RTARDULINKHOST_MAX_PORTS];  // the port array
+
 private:
     ///
-    /// @brief      { function_description }
+    /// @brief      Inits the subsystem
     ///
     void initSubsystem();
 
