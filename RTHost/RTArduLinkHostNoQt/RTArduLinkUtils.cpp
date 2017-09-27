@@ -47,7 +47,7 @@ bool RTArduLinkReassemble(RTARDULINK_RXFRAME *RXFrame, unsigned char data)
 {
     bool flag = true;
 
-    ((unsigned char *)(RXFrame->frameBuffer))[RXFrame->length] = data;  // save byte in correct place
+    reinterpret_cast<unsigned char *>(RXFrame->frameBuffer)[RXFrame->length] = data;  // save byte in correct place
     switch (RXFrame->length) {
         case 0:                                             // waiting for sync0
             if (RXFrame->frameBuffer->sync0 == RTARDULINK_MESSAGE_SYNC0) {
@@ -99,7 +99,7 @@ void RTArduLinkSetChecksum(RTARDULINK_FRAME *frame)
     int i;
     unsigned char *data;
 
-    for (i = 0, cksm = 0, data = (unsigned char *)&(frame->message); i < frame->messageLength; i++)
+    for (i = 0, cksm = 0, data = reinterpret_cast<unsigned char *>(&(frame->message)); i < frame->messageLength; i++)
         cksm += *data++;                                    // add up checksum
     frame->frameChecksum = (255 - cksm) + 1;                // 2s complement
 }
@@ -118,7 +118,7 @@ bool RTArduLinkCheckChecksum(RTARDULINK_FRAME *frame)
 
     length = frame->messageLength + 1;
     cksm = 0;
-    data = (unsigned char *)&(frame->frameChecksum);
+    data = static_cast<unsigned char *>(&(frame->frameChecksum));
 
     for (i = 0; i < length; i++)
         cksm += *data++;
@@ -134,9 +134,9 @@ long RTArduLinkConvertUC4ToLong(RTARDULINK_UC4 UC4)
     long val;
 
     val = UC4[3];
-    val += (long)UC4[2] << 8;
-    val += (long)UC4[1] << 16;
-    val += (long)UC4[0] << 24;
+    val += static_cast<long>(UC4[2]) << 8;
+    val += static_cast<long>(UC4[1]) << 16;
+    val += static_cast<long>(UC4[0]) << 24;
     return val;
 }
 
@@ -153,7 +153,7 @@ int RTArduLinkConvertUC2ToInt(RTARDULINK_UC2 UC2)
     int val;
 
     val = UC2[1];
-    val += (int)UC2[0] << 8;
+    val += static_cast<int>(UC2[0]) << 8;
     return val;
 }
 
@@ -162,7 +162,7 @@ unsigned int RTArduLinkConvertUC2ToUInt(RTARDULINK_UC2 UC2)
     unsigned int val;
 
     val = UC2[1];
-    val += (unsigned int)UC2[0] << 8;
+    val += static_cast<unsigned int>(UC2[0]) << 8;
     return val;
 }
 

@@ -43,14 +43,14 @@ RTArduLinkHostNoQt::~RTArduLinkHostNoQt()
 
 bool RTArduLinkHostNoQt::begin()
 {
-	initSubsystem();
-	sendIdentifyRequest();
-	return true;
+    initSubsystem();
+    sendIdentifyRequest();
+    return true;
 }
 
 bool RTArduLinkHostNoQt::addPort(int port, QString portName, BaudRateType portSpeed)
 {
-	RTARDULINKHOST_PORT *portInfo;
+    RTARDULINKHOST_PORT *portInfo;
 
     if ((port < 0) || (port >= RTARDULINKHOST_MAX_PORTS))
         return false;
@@ -80,7 +80,7 @@ bool RTArduLinkHostNoQt::addPort(int port, QString portName, BaudRateType portSp
 
 bool RTArduLinkHostNoQt::openPort(int port)
 {
-	RTARDULINKHOST_PORT *portInfo;
+    RTARDULINKHOST_PORT *portInfo;
 
     if ((port < 0) || (port >= RTARDULINKHOST_MAX_PORTS))
         return false;
@@ -89,7 +89,7 @@ bool RTArduLinkHostNoQt::openPort(int port)
 
     if (portInfo->port->isOpen())
         return false;
-    
+
     if (portInfo->port->open(QIODevice::ReadWrite)) {
         portInfo->open = true;
     }
@@ -99,7 +99,7 @@ bool RTArduLinkHostNoQt::openPort(int port)
 
 void RTArduLinkHostNoQt::deletePort(int port)
 {
-	RTARDULINKHOST_PORT *portInfo;
+    RTARDULINKHOST_PORT *portInfo;
 
     if ((port < 0) || (port >= RTARDULINKHOST_MAX_PORTS))
         return;
@@ -114,20 +114,20 @@ void RTArduLinkHostNoQt::deletePort(int port)
 
 void RTArduLinkHostNoQt::end()
 {
-	for (int i = 0; i < RTARDULINKHOST_MAX_PORTS; i++)
+    for (int i = 0; i < RTARDULINKHOST_MAX_PORTS; i++)
         deletePort(i);
 
     initSubsystem();
 }
 
-bool RTArduLinkHostNoQt::sendMessage(int port, 
-				 unsigned int messageAddress, 
-				 unsigned char messageType, 
-				 unsigned char messageParam,
-				 unsigned char *data,
-				 int length)
+bool RTArduLinkHostNoQt::sendMessage(int port,
+                                     unsigned int messageAddress,
+                                     unsigned char messageType,
+                                     unsigned char messageParam,
+                                     unsigned char *data,
+                                     int length)
 {
-	RTARDULINK_MESSAGE *message;
+    RTARDULINK_MESSAGE *message;
     qint64 bytesWritten;
     qint64 totalLength;
     unsigned char *framePtr;
@@ -147,10 +147,10 @@ bool RTArduLinkHostNoQt::sendMessage(int port,
 
     message = &(portInfo->TXFrameBuffer.message);
 
-	#ifdef RTARDULINKHOST_TRACE
-	    std::cout << "Sending " << int(message->messageType) << " to port " <<
-	    portInfo->index << " address " << messageAddress << '\n';
-	#endif
+#ifdef RTARDULINKHOST_TRACE
+    std::cout << "Sending " << int(message->messageType) << " to port " <<
+        portInfo->index << " address " << messageAddress << '\n';
+#endif
 
     portInfo->TXFrameBuffer.messageLength = length + RTARDULINK_MESSAGE_HEADER_LEN;
     RTArduLinkConvertIntToUC2(messageAddress, message->messageAddress);
@@ -160,10 +160,10 @@ bool RTArduLinkHostNoQt::sendMessage(int port,
         memcpy(message->data, data, length);
     RTArduLinkSetChecksum(&portInfo->TXFrameBuffer);
     totalLength = RTARDULINK_FRAME_HEADER_LEN + RTARDULINK_MESSAGE_HEADER_LEN + length;
-    framePtr = (unsigned char *)&portInfo->TXFrameBuffer;
+    framePtr = reinterpret_cast<unsigned char *>(&portInfo->TXFrameBuffer);
 
     while (totalLength > 0) {
-        bytesWritten = portInfo->port->write((const char *)framePtr, totalLength);
+        bytesWritten = portInfo->port->write(reinterpret_cast<const char *>(framePtr), totalLength);
         if (bytesWritten == -1) {
             closePort(portInfo);
             return false;
@@ -205,7 +205,7 @@ void RTArduLinkHostNoQt::readyRead()
 
         if (!portInfo->port->isOpen()) {
             if (portInfo->open)
-            portInfo->open = false;
+                portInfo->open = false;
             continue;
         }
 
@@ -217,7 +217,7 @@ void RTArduLinkHostNoQt::readyRead()
         if (bytesAvailable) {
             data = portInfo->port->readAll();
             charData = (unsigned char *)data.constData();
-            for (int i = 0; i < data.length(); i++) {
+            for (auto i = 0; i < data.length(); i++) {
                 if (!RTArduLinkReassemble(&(portInfo->RXFrame), *charData++))
                     std::cout << "Reassembly error on port " << index << '\n';
                 if (portInfo->RXFrame.complete) {
@@ -237,7 +237,7 @@ void RTArduLinkHostNoQt::processReceivedMessage(RTARDULINKHOST_PORT *portInfo)
 
     if ((portInfo->RXFrameBuffer.messageLength < RTARDULINK_MESSAGE_HEADER_LEN) ||
         (portInfo->RXFrameBuffer.messageLength > RTARDULINK_MESSAGE_MAX_LEN)) {
-            std::cout << "Received message with incorrect length " << portInfo->RXFrameBuffer.messageLength << '\n';
+        std::cout << "Received message with incorrect length " << portInfo->RXFrameBuffer.messageLength << '\n';
         return;
     }
 
@@ -249,18 +249,18 @@ void RTArduLinkHostNoQt::processReceivedMessage(RTARDULINKHOST_PORT *portInfo)
     }
     subsystem = m_subsystem[portInfo->index] + address;
 
-	#ifdef RTARDULINKHOST_TRACE
-    	std::cout << "Received " << (int)(message->messageType) << " from port " << portInfo->index << " address " << address << '\n';
-	#endif
+#ifdef RTARDULINKHOST_TRACE
+    std::cout << "Received " << (int)(message->messageType) << " from port " << portInfo->index << " address " << address << '\n';
+#endif
 
     switch (message->messageType)
     {
         case RTARDULINK_MESSAGE_POLL:
             subsystem->pollsIn++;
-            if (!subsystem->active && ((int)strlen(subsystem->identity) > 0)) {
-				#ifdef RTARDULINKHOST_TRACE
-                	std::cout << "Subsystem port " << portInfo->index << " address " << address << '\n';
-				#endif
+            if (!subsystem->active && (static_cast<int>(strlen(subsystem->identity)) > 0)) {
+#ifdef RTARDULINKHOST_TRACE
+                std::cout << "Subsystem port " << portInfo->index << " address " << address << '\n';
+#endif
                 subsystem->active = true;
                 subsystem->pollsIn = 0;
                 subsystem->pollsOut = 0;
@@ -272,30 +272,30 @@ void RTArduLinkHostNoQt::processReceivedMessage(RTARDULINKHOST_PORT *portInfo)
         case RTARDULINK_MESSAGE_IDENTITY:
             subsystem->waitingForIdentity = false;
             message->data[RTARDULINK_DATA_MAX_LEN - 1] = 0;	// make sure zero terminated
-            strcpy(subsystem->identity, (const char *)message->data);
-			#ifdef RTARDULINKHOST_TRACE
-            	std::cout << "Received identity " << subsystem->identity << '\n';
-			#endif
+            strcpy(subsystem->identity, reinterpret_cast<const char *>(message->data));
+#ifdef RTARDULINKHOST_TRACE
+            std::cout << "Received identity " << subsystem->identity << '\n';
+#endif
 
             break;
 
         case RTARDULINK_MESSAGE_DEBUG:
             message->data[RTARDULINK_DATA_MAX_LEN - 1] = 0;	// make sure zero terminated
-            std::cout << "Debug message from port " << portInfo->index << "address: " << 
-            address << ": " << (char *)message->data << '\n';
+            std::cout << "Debug message from port " << portInfo->index << "address: " <<
+                address << ": " << reinterpret_cast<char *>(message->data) << '\n';
 
             break;
 
         default:
-            processCustomMessage(portInfo,address, message->messageType, message->messageParam,
-                        message->data, portInfo->RXFrameBuffer.messageLength - RTARDULINK_MESSAGE_HEADER_LEN);
+            processCustomMessage(portInfo, address, message->messageType, message->messageParam,
+                                 message->data, portInfo->RXFrameBuffer.messageLength - RTARDULINK_MESSAGE_HEADER_LEN);
             break;
     }
 }
 
 void RTArduLinkHostNoQt::sendIdentifyRequest()
 {
-	int port, address;
+    int port, address;
     RTARDULINKHOST_SUBSYSTEM *subsystem;
 
     // check if any active subsystem failed to respond
@@ -324,7 +324,7 @@ void RTArduLinkHostNoQt::sendIdentifyRequest()
 
 void RTArduLinkHostNoQt::sendPollRequest()
 {
-	int port, address;
+    int port, address;
     RTARDULINKHOST_SUBSYSTEM *subsystem;
 
     // check if any active subsystem failed to respond
@@ -356,12 +356,13 @@ void RTArduLinkHostNoQt::closePort(RTARDULINKHOST_PORT *portInfo)
         return;
     if (portInfo->port->isOpen()) {
         portInfo->port->close();
-        if (portInfo->open){}
+        if (portInfo->open) {
+        }
     }
     portInfo->open = false;
 }
 
 void RTArduLinkHostNoQt::processCustomMessage(RTARDULINKHOST_PORT *portInfo, unsigned int messageAddress,
-                                      unsigned char messageType, unsigned char messageParam, unsigned char *data, int dataLength)
+                                              unsigned char messageType, unsigned char messageParam, unsigned char *data, int dataLength)
 {
 }
