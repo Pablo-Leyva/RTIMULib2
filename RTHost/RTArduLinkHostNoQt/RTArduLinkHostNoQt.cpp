@@ -216,7 +216,7 @@ void RTArduLinkHostNoQt::readyRead()
         }
         if (bytesAvailable) {
             data = portInfo->port->readAll();
-            charData = (unsigned char *)data.constData();
+            charData = reinterpret_cast<unsigned char*>(const_cast<char*>(data.constData()));
             for (auto i = 0; i < data.length(); i++) {
                 if (!RTArduLinkReassemble(&(portInfo->RXFrame), *charData++))
                     std::cout << "Reassembly error on port " << index << '\n';
