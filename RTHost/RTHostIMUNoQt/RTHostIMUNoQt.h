@@ -35,6 +35,8 @@ class RTHostIMUNoQt
 public:
     RTHostIMUNoQt();
     ~RTHostIMUNoQt();
+    bool run();
+    void newIMU();
 
 private:
     void loadSettings();
@@ -42,12 +44,12 @@ private:
 
     QSettings *m_settings;
 
+    RTIMU *m_imu;
     RTIMU_DATA m_imuData; // this holds the IMU information and fusion output
+    RTIMUSettings *m_RTIMUsettings;
+    
+    int m_sample_rate;
 
-    int m_rateTimer;
-    int m_displayTimer;
-
-    int m_sampleCount;
 };
 
 #endif // _RTHOSTIMU_H

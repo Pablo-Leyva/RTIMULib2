@@ -27,6 +27,7 @@
 #include "RTArduLinkHostNoQt.h"
 #include "IMUDrivers/RTIMU.h"
 #include "RTArduLinkIMUDefs.h"
+#include "RTIMULib.h"
 
 #include <qqueue.h>
 
@@ -34,8 +35,6 @@
 
 #define RTARDULINKHOST_SETTINGS_PORT    "port"
 #define RTARDULINKHOST_SETTINGS_SPEED   "speed"
-
-class RTIMUSettings;
 
 class RTHostIMUClientNoQt : public RTArduLinkHostNoQt, public RTIMU
 {

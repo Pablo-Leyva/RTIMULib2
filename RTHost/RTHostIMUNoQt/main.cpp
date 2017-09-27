@@ -27,7 +27,9 @@
 int main(int argc, char *argv[])
 {
 
-    RTHostIMUNoQt *w = new RTHostIMUNoQt();
+    RTHostIMUNoQt *imu_host = new RTHostIMUNoQt();
+
+    imu_host->run();
 
     return 0;
 }

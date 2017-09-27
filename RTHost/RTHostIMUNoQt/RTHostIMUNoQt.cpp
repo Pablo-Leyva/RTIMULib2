@@ -32,11 +32,35 @@
 #define RATE_TIMER_INTERVAL 2
 
 RTHostIMUNoQt::RTHostIMUNoQt()
-{
+{    
+    m_imu = nullptr;
 }
 
 RTHostIMUNoQt::~RTHostIMUNoQt()
 {
+}
+
+bool RTHostIMUNoQt::run()
+{
+    loadSettings();
+    newIMU();
+    while(m_imu->IMURead())
+    {
+        m_imuData = m_imu->getIMUData();
+        printf("Gyro: \t %f,\t %f,\t %f \n", m_imuData.gyro.x(), m_imuData.gyro.y(), m_imuData.gyro.z());
+        printf("Accel: \t %f,\t %f,\t %f \n", m_imuData.accel.x(), m_imuData.accel.y(), m_imuData.accel.z());
+        printf("Compass: \t %f,\t %f,\t %f \n", m_imuData.compass.x(), m_imuData.compass.y(), m_imuData.compass.z());
+        printf("Pose: \t %f,\t %f,\t %f \n", m_imuData.fusionPose.x(), m_imuData.fusionPose.y(), m_imuData.fusionPose.z());
+    }
+    return false;
+}
+
+void RTHostIMUNoQt::newIMU()
+{
+    m_RTIMUsettings = new RTIMUSettings();
+    // m_imu = new RTHostIMUClientNoQt(m_RTIMUsettings); //why it is not possible to initialize it???????
+    m_imu->IMUInit();
+    m_sample_rate = m_imu->IMUGetPollInterval();
 }
 
 void RTHostIMUNoQt::loadSettings()
