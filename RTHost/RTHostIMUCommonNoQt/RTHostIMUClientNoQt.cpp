@@ -62,9 +62,15 @@ bool RTHostIMUClientNoQt::IMUInit()
     if ((speed >= 0) && (speed <= 4))
         speed = 4;
 
-    addPort(0, portString, speedMap[speed]);
-
-    begin();
+    if(addPort(0, portString, speedMap[speed]))
+    {
+      openPort(0);
+      begin();
+    }
+    else
+    {
+      return false;
+    }
     return true;
 }
 

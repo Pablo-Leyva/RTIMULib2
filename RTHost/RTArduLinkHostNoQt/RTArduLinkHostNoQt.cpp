@@ -39,6 +39,7 @@ RTArduLinkHostNoQt::RTArduLinkHostNoQt()
 
 RTArduLinkHostNoQt::~RTArduLinkHostNoQt()
 {
+    end();
 }
 
 bool RTArduLinkHostNoQt::begin()

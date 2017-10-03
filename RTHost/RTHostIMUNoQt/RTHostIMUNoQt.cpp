@@ -34,7 +34,7 @@
 
 RTHostIMUNoQt::RTHostIMUNoQt()
 {    
-    m_imu = nullptr;
+    m_imu = NULL;
 }
 
 RTHostIMUNoQt::~RTHostIMUNoQt()
@@ -45,13 +45,16 @@ bool RTHostIMUNoQt::run()
 {
     loadSettings();
     newIMU();
-    while(m_imu->IMURead())
+    while(true)
     {
-        m_imuData = m_imu->getIMUData();
-        printf("Gyro: \t %f,\t %f,\t %f \n", m_imuData.gyro.x(), m_imuData.gyro.y(), m_imuData.gyro.z());
-        printf("Accel: \t %f,\t %f,\t %f \n", m_imuData.accel.x(), m_imuData.accel.y(), m_imuData.accel.z());
-        printf("Compass: \t %f,\t %f,\t %f \n", m_imuData.compass.x(), m_imuData.compass.y(), m_imuData.compass.z());
-        printf("Pose: \t %f,\t %f,\t %f \n", m_imuData.fusionPose.x(), m_imuData.fusionPose.y(), m_imuData.fusionPose.z());
+        if (m_imu->IMURead())
+        {
+            m_imuData = m_imu->getIMUData();
+            printf("Gyro: \t\t %f,\t %f,\t %f \n", m_imuData.gyro.x(), m_imuData.gyro.y(), m_imuData.gyro.z());
+            printf("Accel: \t\t %f,\t %f,\t %f \n", m_imuData.accel.x(), m_imuData.accel.y(), m_imuData.accel.z());
+            printf("Compass: \t %f,\t %f,\t %f \n", m_imuData.compass.x(), m_imuData.compass.y(), m_imuData.compass.z());
+            printf("Pose: \t\t %f,\t %f,\t %f \n\n", m_imuData.fusionPose.x(), m_imuData.fusionPose.y(), m_imuData.fusionPose.z());            
+        }
     }
     return false;
 }
