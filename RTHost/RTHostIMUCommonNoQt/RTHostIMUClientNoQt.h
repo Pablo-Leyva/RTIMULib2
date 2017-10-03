@@ -33,8 +33,9 @@
 
 //  setting keys for client data
 
-#define RTARDULINKHOST_SETTINGS_PORT    "port"
-#define RTARDULINKHOST_SETTINGS_SPEED   "speed"
+#define RTARDULINKHOST_SETTINGS_PORT                   "port"
+#define RTARDULINKHOST_SETTINGS_SPEED                  "speed"
+#define RTARDULINKHOST_SETTINGS_MARKER_HISTORY_LIMIT   "marker_history_limit"
 
 class RTHostIMUClientNoQt : public RTArduLinkHostNoQt, public RTIMU
 {

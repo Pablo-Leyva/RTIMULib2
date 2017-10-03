@@ -76,6 +76,7 @@ bool RTHostIMUClientNoQt::IMUInit()
 
 bool RTHostIMUClientNoQt::IMURead()
 {
+    readyRead();
     if (m_messageQ.empty())
         return false;
 

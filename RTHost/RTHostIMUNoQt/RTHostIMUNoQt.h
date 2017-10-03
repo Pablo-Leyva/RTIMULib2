@@ -30,14 +30,21 @@
 #include "RTIMULib.h"
 #include "RTHostIMUClientNoQt.h"
 
+#include <ros/ros.h>
+#include <sensor_msgs/Imu.h>
+#include <sensor_msgs/MagneticField.h>
+#include <visualization_msgs/Marker.h>
+
 class RTHostIMUNoQt
 {
 
 public:
-    RTHostIMUNoQt();
+    RTHostIMUNoQt(ros::NodeHandle& nh, const ros::NodeHandle& private_nh);
     ~RTHostIMUNoQt();
     bool run();
     void newIMU();
+    void pubData();
+    void ROSInit(ros::NodeHandle& nh);
 
 private:
     void loadSettings();
@@ -50,6 +57,19 @@ private:
     RTIMUSettings *m_RTIMUsettings;
     
     int m_sample_rate;
+
+    // ROS
+    ros::NodeHandle& nh_;
+    std::string imu_topic_name_;
+    std::string mag_topic_name_;
+    std::string frame_id_;
+    ros::Publisher imu_pub_;
+    ros::Publisher mag_pub_;
+    ros::Publisher accel_marker_pub_;
+    ros::Publisher compass_marker_pub_;
+    uint32_t marker_history_limit_;
+    uint32_t marker_id_;
+    float compassScaleFactor_;
 
 };
 

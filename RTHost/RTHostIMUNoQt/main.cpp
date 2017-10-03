@@ -26,8 +26,12 @@
 
 int main(int argc, char *argv[])
 {
+	ros::init(argc, argv, "RTHostIMU");
 
-    RTHostIMUNoQt *imu_host = new RTHostIMUNoQt();
+	ros::NodeHandle nh;
+    ros::NodeHandle nh_private("~");
+
+    RTHostIMUNoQt *imu_host = new RTHostIMUNoQt(nh, nh_private);
 
     imu_host->run();
 

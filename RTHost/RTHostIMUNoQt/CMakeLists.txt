@@ -27,6 +27,9 @@
 # Copyright 2014 Ettus Research LLC
 #
 
+# C++11 Support
+set (CMAKE_CXX_STANDARD 11)
+
 SET(HOST_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/RTHostIMUNoQt.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
@@ -34,12 +37,43 @@ SET(HOST_SRCS
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
+########################################################################
+# ROS setup
+########################################################################
+
+## Find catkin macros and libraries
+find_package(catkin REQUIRED COMPONENTS
+  roscpp
+  sensor_msgs
+)
+
+###################################
+## catkin specific configuration ##
+###################################
+## The catkin_package macro generates cmake config files for the package
+catkin_package(
+  CATKIN_DEPENDS roscpp sensor_msgs
+)
+
+###########
+## Build ##
+###########
+## Specify additional locations of header files
+include_directories(
+  include
+  ${catkin_INCLUDE_DIRS}
+)
+
+########################################################################
+########################################################################
+
 SET(CMAKE_AUTOMOC ON)
 
 IF(DEFINED QT5)
     FIND_PACKAGE(Qt5Widgets)
     ADD_EXECUTABLE(RTHostIMUNoQt ${HOST_SRCS})
     TARGET_LINK_LIBRARIES(RTHostIMUNoQt
+    	${catkin_LIBRARIES}
     	RTIMULib
         RTHostIMUCommon
         RTArduLinkHostNoQt
@@ -50,7 +84,8 @@ ELSE(DEFINED QT5)
     INCLUDE(${QT_USE_FILE})
     ADD_DEFINITIONS(${QT_DEFINITIONS})
     ADD_EXECUTABLE(RTHostIMUNoQt ${HOST_SRCS}) 
-    TARGET_LINK_LIBRARIES(RTHostIMUNoQt 
+    TARGET_LINK_LIBRARIES(RTHostIMUNoQt
+    	${catkin_LIBRARIES}
     	RTIMULib 
     	RTHostIMUCommon 
     	RTArduLinkHostNoQt 
