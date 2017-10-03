@@ -28,6 +28,7 @@
 
 #include "RTHostIMUNoQt.h"
 #include "RTHostIMUClientNoQt.h"
+#include "RTHostIMUClientNoQt.cpp"
 
 #define RATE_TIMER_INTERVAL 2
 
@@ -58,7 +59,7 @@ bool RTHostIMUNoQt::run()
 void RTHostIMUNoQt::newIMU()
 {
     m_RTIMUsettings = new RTIMUSettings();
-    // m_imu = new RTHostIMUClientNoQt(m_RTIMUsettings); //why it is not possible to initialize it???????
+    m_imu = new RTHostIMUClientNoQt(m_RTIMUsettings);
     m_imu->IMUInit();
     m_sample_rate = m_imu->IMUGetPollInterval();
 }

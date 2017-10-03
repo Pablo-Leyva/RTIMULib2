@@ -28,6 +28,7 @@
 #include <qsettings.h>
 
 #include "RTIMULib.h"
+#include "RTHostIMUClientNoQt.h"
 
 class RTHostIMUNoQt
 {
