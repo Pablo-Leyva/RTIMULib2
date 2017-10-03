@@ -33,7 +33,7 @@
 #define RATE_TIMER_INTERVAL 2
 
 RTHostIMUNoQt::RTHostIMUNoQt(ros::NodeHandle& nh, const ros::NodeHandle& private_nh)
-    : nh_(nh), compassScaleFactor_(0.5)
+    : nh_(nh), compassScaleFactor_(0.5), accelScaleFactor_(3.0)
 {    
     m_imu = NULL;
     ROSInit(nh);
@@ -43,7 +43,7 @@ RTHostIMUNoQt::~RTHostIMUNoQt()
 {
 }
 
-bool RTHostIMUNoQt::run()
+void RTHostIMUNoQt::run()
 {
     loadSettings();
     newIMU();
@@ -59,8 +59,6 @@ bool RTHostIMUNoQt::run()
         }
         update_rate_.sleep();
     }
-
-    return false;
 }
 
 void RTHostIMUNoQt::newIMU()
@@ -68,11 +66,11 @@ void RTHostIMUNoQt::newIMU()
     m_RTIMUsettings = new RTIMUSettings();
     m_imu = new RTHostIMUClientNoQt(m_RTIMUsettings);
     m_imu->IMUInit();
-    m_sample_rate = m_imu->IMUGetPollInterval();
 }
 
 void RTHostIMUNoQt::pubData()
 {
+    // Fill and publish Imu msg
     sensor_msgs::Imu imu_msg;
     
     imu_msg.header.stamp                    = ros::Time::now();
@@ -102,6 +100,7 @@ void RTHostIMUNoQt::pubData()
 
     imu_pub_.publish(imu_msg);
 
+    // Fill and publish MagneticField msg
     sensor_msgs::MagneticField mag_msg;
 
     mag_msg.header.stamp              = ros::Time::now();
@@ -116,15 +115,16 @@ void RTHostIMUNoQt::pubData()
 
     mag_pub_.publish(mag_msg);
 
+    // Fill and publish markers
     visualization_msgs::Marker accel_marker_msg;
 
     accel_marker_msg.header                = imu_msg.header;
     accel_marker_msg.id                    = marker_id_;
     accel_marker_msg.type                  = visualization_msgs::Marker::SPHERE;
     accel_marker_msg.action                = visualization_msgs::Marker::ADD;
-    accel_marker_msg.pose.position.x       = imu_msg.linear_acceleration.x;
-    accel_marker_msg.pose.position.y       = imu_msg.linear_acceleration.y;
-    accel_marker_msg.pose.position.z       = imu_msg.linear_acceleration.z;
+    accel_marker_msg.pose.position.x       = imu_msg.linear_acceleration.x * accelScaleFactor_;
+    accel_marker_msg.pose.position.y       = imu_msg.linear_acceleration.y * accelScaleFactor_;
+    accel_marker_msg.pose.position.z       = imu_msg.linear_acceleration.z * accelScaleFactor_;
     accel_marker_msg.scale.x               = 1.0;
     accel_marker_msg.scale.y               = 1.0;
     accel_marker_msg.scale.z               = 1.0;
@@ -163,10 +163,10 @@ void RTHostIMUNoQt::pubData()
 void RTHostIMUNoQt::ROSInit(ros::NodeHandle& nh)
 {
     // Initialize ROS publishers
-    imu_pub_            = nh.advertise<sensor_msgs::Imu>(          "imu/data",             1);
-    mag_pub_            = nh.advertise<sensor_msgs::MagneticField>("imu/mag",              1);
-    accel_marker_pub_   = nh.advertise<visualization_msgs::Marker>("accel_marker",         1);
-    compass_marker_pub_ = nh.advertise<visualization_msgs::Marker>("compass_marker",       1);
+    imu_pub_            = nh.advertise<sensor_msgs::Imu>            (   "imu/data",             1);
+    mag_pub_            = nh.advertise<sensor_msgs::MagneticField>  (   "imu/mag",              1);
+    accel_marker_pub_   = nh.advertise<visualization_msgs::Marker>  (   "accel_marker",         1);
+    compass_marker_pub_ = nh.advertise<visualization_msgs::Marker>  (   "compass_marker",       1);
 
     // Publishing frame for IMU data
     frame_id_ = "imu_link";
@@ -180,8 +180,7 @@ void RTHostIMUNoQt::loadSettings()
 
     m_settings = new QSettings("RTHostIMU.ini", QSettings::IniFormat);
 
-    //	See if need to set defaults
-
+    // Check parameters and set them if they do not exist
     if (!m_settings->contains(RTARDULINKHOST_SETTINGS_PORT))
         m_settings->setValue(RTARDULINKHOST_SETTINGS_PORT, "Off");
     if (!m_settings->contains(RTARDULINKHOST_SETTINGS_SPEED))
@@ -189,13 +188,9 @@ void RTHostIMUNoQt::loadSettings()
     if (!m_settings->contains(RTARDULINKHOST_SETTINGS_MARKER_HISTORY_LIMIT))
         m_settings->setValue(RTARDULINKHOST_SETTINGS_MARKER_HISTORY_LIMIT, 100000);
 
-    //	Now read in values
-
-    portString = m_settings->value(RTARDULINKHOST_SETTINGS_PORT).toString();
-    
-
-    speed = m_settings->value(RTARDULINKHOST_SETTINGS_SPEED).toInt();
-
+    // Read parameters
+    portString            = m_settings->value(RTARDULINKHOST_SETTINGS_PORT).toString();
+    speed                 = m_settings->value(RTARDULINKHOST_SETTINGS_SPEED).toInt();
     marker_history_limit_ = m_settings->value(RTARDULINKHOST_SETTINGS_MARKER_HISTORY_LIMIT).toInt();
     
 }

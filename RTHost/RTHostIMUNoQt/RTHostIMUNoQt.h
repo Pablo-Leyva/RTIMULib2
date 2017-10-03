@@ -39,26 +39,65 @@ class RTHostIMUNoQt
 {
 
 public:
+    ///
+    /// @brief      Default constructor
+    ///
+    /// @param[in]  nh          Public node
+    /// @param[in]  private_nh  Private node for parameters (still to implement)
+    ///
     RTHostIMUNoQt(ros::NodeHandle& nh, const ros::NodeHandle& private_nh);
+
+    ///
+    /// @brief      Destroys the object
+    ///
     ~RTHostIMUNoQt();
-    bool run();
+
+    ///
+    /// @brief      Starts the processing
+    ///
+    void run();
+
+    ///
+    /// @brief      Creates a new IMU
+    ///
     void newIMU();
+
+    ///
+    /// @brief      Publish the data in ROS
+    ///
     void pubData();
+
+    //
+    // @brief      Inits the ROS variables (publishers and other params)
+    //
+    // @param      nh    Node for publishing the data
+    //
     void ROSInit(ros::NodeHandle& nh);
 
 private:
+    ///
+    /// @brief      Loads the settings from the file RTHost.ini
+    ///
     void loadSettings();
+
+    ///
+    /// @brief      Saves the settings
+    ///
     void saveSettings();
 
+    // Stores the RTHostIMU settings
     QSettings *m_settings;
 
+    // RTIMU for storing the IMU params
     RTIMU *m_imu;
-    RTIMU_DATA m_imuData; // this holds the IMU information and fusion output
-    RTIMUSettings *m_RTIMUsettings;
-    
-    int m_sample_rate;
 
-    // ROS
+    // Stores the IMU read values and the pose fusion
+    RTIMU_DATA m_imuData;
+
+    // Stores the IMU settings
+    RTIMUSettings *m_RTIMUsettings;
+
+    // ROS variables
     ros::NodeHandle& nh_;
     std::string imu_topic_name_;
     std::string mag_topic_name_;
@@ -67,9 +106,12 @@ private:
     ros::Publisher mag_pub_;
     ros::Publisher accel_marker_pub_;
     ros::Publisher compass_marker_pub_;
+
+    // Other parameters
     uint32_t marker_history_limit_;
     uint32_t marker_id_;
     float compassScaleFactor_;
+    float accelScaleFactor_;
 
 };
 
