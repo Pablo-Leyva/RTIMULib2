@@ -54,7 +54,7 @@ bool RTHostIMUClientNoQt::IMUInit()
 
     setCalibrationData();
 
-    QSettings *settings = new QSettings("RTHostIMU.ini", QSettings::IniFormat);
+    QSettings *settings = new QSettings("/home/atroya/imcoders_ws/src/imcoder_reader/config/RTHostIMU.ini", QSettings::IniFormat);
 
     portString = settings->value(RTARDULINKHOST_SETTINGS_PORT).toString();
 

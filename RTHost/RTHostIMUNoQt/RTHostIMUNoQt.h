@@ -72,7 +72,7 @@ public:
     //
     // @param      nh    Node for publishing the data
     //
-    void ROSInit(ros::NodeHandle& nh);
+    bool ROSInit(ros::NodeHandle& nh, const ros::NodeHandle& private_nh);
 
 private:
     ///
@@ -106,6 +106,7 @@ private:
     ros::Publisher mag_pub_;
     ros::Publisher accel_marker_pub_;
     ros::Publisher compass_marker_pub_;
+    std::string path_to_settings_file_;
 
     // Other parameters
     uint32_t marker_history_limit_;
