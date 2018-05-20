@@ -49,12 +49,15 @@ public:
     virtual bool IMURead();
     virtual int IMUGetPollInterval();
 
+    void setSettingsPath(QString path);
+
 protected:
     void processCustomMessage(RTARDULINKHOST_PORT *portInfo, unsigned int messageAddress,
                        unsigned char messageType, unsigned char messageParam, unsigned char *data, int dataLength);
 
 private:
     QQueue<RTARDULINKIMU_MESSAGE> m_messageQ;
+    QString m_settings_path;
 };
 
 extern BaudRateType speedMap[];

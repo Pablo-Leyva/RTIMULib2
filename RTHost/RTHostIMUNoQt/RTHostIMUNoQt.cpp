@@ -79,8 +79,12 @@ void RTHostIMUNoQt::newIMU()
 
     m_RTIMUsettings = new RTIMUSettings();
     m_imu = new RTHostIMUClientNoQt(m_RTIMUsettings);
+    static_cast<RTHostIMUClientNoQt*>(m_imu)->setSettingsPath(QString::fromStdString(path_to_settings_file_));
     m_imu->IMUInit();
     ROS_INFO("IMcoder initialized on port %s\n", m_settings->value(RTARDULINKHOST_SETTINGS_PORT).toString().toUtf8().constData());
+/*
+    RTHostIMUClientNoQt *a = new RTHostIMUClientNoQt(m_RTIMUsettings);
+    a->setSettingsPath();*/
 
 }
 
@@ -181,7 +185,7 @@ bool RTHostIMUNoQt::ROSInit(ros::NodeHandle& nh, const ros::NodeHandle& private_
 
     if(!private_nh.getParam("path_to_settings_file", path_to_settings_file_))
     {
-        ROS_ERROR("No path_to_RTHostIMU_settings_file provided");
+        ROS_ERROR("No path_to_settings_file provided");
         return false;
     }
     else

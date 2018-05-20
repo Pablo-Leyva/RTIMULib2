@@ -43,6 +43,11 @@ RTHostIMUClientNoQt::~RTHostIMUClientNoQt()
 {
 }
 
+void RTHostIMUClientNoQt::setSettingsPath(QString path)
+{
+    m_settings_path = path;
+}
+
 //----------------------------------------------------------
 //
 //  RTIMU overrides
@@ -54,8 +59,9 @@ bool RTHostIMUClientNoQt::IMUInit()
 
     setCalibrationData();
 
-    QSettings *settings = new QSettings("/home/atroya/imcoders_ws/src/imcoder_reader/config/RTHostIMU.ini", QSettings::IniFormat);
-
+    QSettings *settings = new QSettings(m_settings_path, QSettings::IniFormat);
+    qDebug() << settings->value(RTARDULINKHOST_SETTINGS_PORT).toString();
+    qDebug() << settings->fileName();
     portString = settings->value(RTARDULINKHOST_SETTINGS_PORT).toString();
 
     speed = settings->value(RTARDULINKHOST_SETTINGS_SPEED).toInt();
