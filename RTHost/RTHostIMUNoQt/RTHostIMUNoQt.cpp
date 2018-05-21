@@ -67,7 +67,7 @@ void RTHostIMUNoQt::run()
         }
         else
         {
-            ROS_WARN_ONCE("%s ready", imcoder_name_.c_str());
+            ROS_WARN_ONCE("%s not ready yet", imcoder_name_.c_str());
         }
 
         update_rate_.sleep();
@@ -81,7 +81,7 @@ void RTHostIMUNoQt::newIMU()
     m_imu = new RTHostIMUClientNoQt(m_RTIMUsettings);
     static_cast<RTHostIMUClientNoQt*>(m_imu)->setSettingsPath(QString::fromStdString(path_to_settings_file_));
     m_imu->IMUInit();
-    ROS_INFO("IMcoder initialized on port %s\n", m_settings->value(RTARDULINKHOST_SETTINGS_PORT).toString().toUtf8().constData());
+    ROS_INFO("IMcoder initialized on port %s", m_settings->value(RTARDULINKHOST_SETTINGS_PORT).toString().toUtf8().constData());
 /*
     RTHostIMUClientNoQt *a = new RTHostIMUClientNoQt(m_RTIMUsettings);
     a->setSettingsPath();*/
