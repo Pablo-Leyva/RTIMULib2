@@ -47,7 +47,7 @@
 RTIMUSettings::RTIMUSettings(const char *productType)
 {
     if ((strlen(productType) > 200) || (strlen(productType) == 0)) {
-        HAL_ERROR("Product name too long or null - using default\n");
+        HAL_ERROR("[RTIMULib INFO]: Product name too long or null - using default\n");
         strcpy(m_filename, "RTIMULib.ini");
     } else {
         sprintf(m_filename, "%s.ini", productType);
@@ -58,7 +58,7 @@ RTIMUSettings::RTIMUSettings(const char *productType)
 RTIMUSettings::RTIMUSettings(const char *settingsDirectory, const char *productType)
 {
     if (((strlen(productType) + strlen(settingsDirectory)) > 200) || (strlen(productType) == 0)) {
-        HAL_ERROR("Product name too long or null - using default\n");
+        HAL_ERROR("[RTIMULib INFO]: Product name too long or null - using default\n");
         strcpy(m_filename, "RTIMULib.ini");
     } else {
         sprintf(m_filename, "%s/%s.ini", settingsDirectory, productType);
@@ -83,13 +83,13 @@ bool RTIMUSettings::discoverIMU(int& imuType, bool& busIsI2C, unsigned char& sla
                 imuType = RTIMU_TYPE_MPU9250;
                 slaveAddress = MPU9250_ADDRESS0;
                 busIsI2C = true;
-                HAL_INFO("Detected MPU9250 at standard address\n");
+                HAL_INFO("[RTIMULib INFO]: Detected MPU9250 at standard address\n");
                 return true;
             } else if (result == MPU9150_ID) {
                 imuType = RTIMU_TYPE_MPU9150;
                 slaveAddress = MPU9150_ADDRESS0;
                 busIsI2C = true;
-                HAL_INFO("Detected MPU9150 at standard address\n");
+                HAL_INFO("[RTIMULib INFO]: Detected MPU9150 at standard address\n");
                 return true;
             }
         }
@@ -99,13 +99,13 @@ bool RTIMUSettings::discoverIMU(int& imuType, bool& busIsI2C, unsigned char& sla
                 imuType = RTIMU_TYPE_MPU9250;
                 slaveAddress = MPU9250_ADDRESS1;
                 busIsI2C = true;
-                HAL_INFO("Detected MPU9250 at option address\n");
+                HAL_INFO("[RTIMULib INFO]: Detected MPU9250 at option address\n");
                 return true;
             } else if (result == MPU9150_ID) {
                 imuType = RTIMU_TYPE_MPU9150;
                 slaveAddress = MPU9150_ADDRESS1;
                 busIsI2C = true;
-                HAL_INFO("Detected MPU9150 at option address\n");
+                HAL_INFO("[RTIMULib INFO]: Detected MPU9150 at option address\n");
                 return true;
             }
         }
@@ -117,7 +117,7 @@ bool RTIMUSettings::discoverIMU(int& imuType, bool& busIsI2C, unsigned char& sla
                         imuType = RTIMU_TYPE_GD20HM303D;
                         slaveAddress = L3GD20H_ADDRESS0;
                         busIsI2C = true;
-                        HAL_INFO("Detected L3GD20H/LSM303D at standard/standard address\n");
+                        HAL_INFO("[RTIMULib INFO]: Detected L3GD20H/LSM303D at standard/standard address\n");
                         return true;
                     }
                 }
@@ -126,7 +126,7 @@ bool RTIMUSettings::discoverIMU(int& imuType, bool& busIsI2C, unsigned char& sla
                         imuType = RTIMU_TYPE_GD20HM303D;
                         slaveAddress = L3GD20H_ADDRESS0;
                         busIsI2C = true;
-                        HAL_INFO("Detected L3GD20H/LSM303D at standard/option address\n");
+                        HAL_INFO("[RTIMULib INFO]: Detected L3GD20H/LSM303D at standard/option address\n");
                         return true;
                     }
                 }
@@ -134,7 +134,7 @@ bool RTIMUSettings::discoverIMU(int& imuType, bool& busIsI2C, unsigned char& sla
                     imuType = RTIMU_TYPE_GD20HM303DLHC;
                     slaveAddress = L3GD20H_ADDRESS0;
                     busIsI2C = true;
-                    HAL_INFO("Detected L3GD20H/LSM303DLHC at standard/standard address\n");
+                    HAL_INFO("[RTIMULib INFO]: Detected L3GD20H/LSM303DLHC at standard/standard address\n");
                     return true;
                 }
             } else if (result == LSM9DS0_GYRO_ID) {
@@ -143,7 +143,7 @@ bool RTIMUSettings::discoverIMU(int& imuType, bool& busIsI2C, unsigned char& sla
                         imuType = RTIMU_TYPE_LSM9DS0;
                         slaveAddress = LSM9DS0_GYRO_ADDRESS0;
                         busIsI2C = true;
-                        HAL_INFO("Detected LSM9DS0 at standard/standard address\n");
+                        HAL_INFO("[RTIMULib INFO]: Detected LSM9DS0 at standard/standard address\n");
                         return true;
                     }
                 }
@@ -152,7 +152,7 @@ bool RTIMUSettings::discoverIMU(int& imuType, bool& busIsI2C, unsigned char& sla
                         imuType = RTIMU_TYPE_LSM9DS0;
                         slaveAddress = LSM9DS0_GYRO_ADDRESS0;
                         busIsI2C = true;
-                        HAL_INFO("Detected LSM9DS0 at standard/option address\n");
+                        HAL_INFO("[RTIMULib INFO]: Detected LSM9DS0 at standard/option address\n");
                         return true;
                     }
                 }
@@ -162,7 +162,7 @@ bool RTIMUSettings::discoverIMU(int& imuType, bool& busIsI2C, unsigned char& sla
                         imuType = RTIMU_TYPE_LSM9DS1;
                         slaveAddress = LSM9DS1_ADDRESS0;
                         busIsI2C = true;
-                        HAL_INFO("Detected LSM9DS1 at standard/standard address\n");
+                        HAL_INFO("[RTIMULib INFO]: Detected LSM9DS1 at standard/standard address\n");
                         return true;
                     }
                 }
@@ -171,7 +171,7 @@ bool RTIMUSettings::discoverIMU(int& imuType, bool& busIsI2C, unsigned char& sla
                         imuType = RTIMU_TYPE_LSM9DS1;
                         slaveAddress = LSM9DS1_ADDRESS0;
                         busIsI2C = true;
-                        HAL_INFO("Detected LSM9DS1 at standard/option 1 address\n");
+                        HAL_INFO("[RTIMULib INFO]: Detected LSM9DS1 at standard/option 1 address\n");
                         return true;
                     }
                 }
@@ -180,7 +180,7 @@ bool RTIMUSettings::discoverIMU(int& imuType, bool& busIsI2C, unsigned char& sla
                         imuType = RTIMU_TYPE_LSM9DS1;
                         slaveAddress = LSM9DS1_ADDRESS0;
                         busIsI2C = true;
-                        HAL_INFO("Detected LSM9DS1 at standard/option 2 address\n");
+                        HAL_INFO("[RTIMULib INFO]: Detected LSM9DS1 at standard/option 2 address\n");
                         return true;
                     }
                 }
@@ -189,7 +189,7 @@ bool RTIMUSettings::discoverIMU(int& imuType, bool& busIsI2C, unsigned char& sla
                         imuType = RTIMU_TYPE_LSM9DS1;
                         slaveAddress = LSM9DS1_ADDRESS0;
                         busIsI2C = true;
-                        HAL_INFO("Detected LSM9DS1 at standard/option 3 address\n");
+                        HAL_INFO("[RTIMULib INFO]: Detected LSM9DS1 at standard/option 3 address\n");
                         return true;
                     }
                 }
@@ -203,7 +203,7 @@ bool RTIMUSettings::discoverIMU(int& imuType, bool& busIsI2C, unsigned char& sla
                         imuType = RTIMU_TYPE_GD20HM303D;
                         slaveAddress = L3GD20H_ADDRESS1;
                         busIsI2C = true;
-                        HAL_INFO("Detected L3GD20H/LSM303D at option/option address\n");
+                        HAL_INFO("[RTIMULib INFO]: Detected L3GD20H/LSM303D at option/option address\n");
                         return true;
                     }
                 }
@@ -212,7 +212,7 @@ bool RTIMUSettings::discoverIMU(int& imuType, bool& busIsI2C, unsigned char& sla
                         imuType = RTIMU_TYPE_GD20HM303D;
                         slaveAddress = L3GD20H_ADDRESS1;
                         busIsI2C = true;
-                        HAL_INFO("Detected L3GD20H/LSM303D at option/standard address\n");
+                        HAL_INFO("[RTIMULib INFO]: Detected L3GD20H/LSM303D at option/standard address\n");
                         return true;
                     }
                 }
@@ -220,7 +220,7 @@ bool RTIMUSettings::discoverIMU(int& imuType, bool& busIsI2C, unsigned char& sla
                     imuType = RTIMU_TYPE_GD20HM303DLHC;
                     slaveAddress = L3GD20H_ADDRESS1;
                     busIsI2C = true;
-                    HAL_INFO("Detected L3GD20H/LSM303DLHC at option/standard address\n");
+                    HAL_INFO("[RTIMULib INFO]: Detected L3GD20H/LSM303DLHC at option/standard address\n");
                     return true;
                 }
             } else if (result == LSM9DS0_GYRO_ID) {
@@ -229,7 +229,7 @@ bool RTIMUSettings::discoverIMU(int& imuType, bool& busIsI2C, unsigned char& sla
                         imuType = RTIMU_TYPE_LSM9DS0;
                         slaveAddress = LSM9DS0_GYRO_ADDRESS1;
                         busIsI2C = true;
-                        HAL_INFO("Detected LSM9DS0 at option/option address\n");
+                        HAL_INFO("[RTIMULib INFO]: Detected LSM9DS0 at option/option address\n");
                         return true;
                     }
                 }
@@ -238,7 +238,7 @@ bool RTIMUSettings::discoverIMU(int& imuType, bool& busIsI2C, unsigned char& sla
                         imuType = RTIMU_TYPE_LSM9DS0;
                         slaveAddress = LSM9DS0_GYRO_ADDRESS1;
                         busIsI2C = true;
-                        HAL_INFO("Detected LSM9DS0 at option/standard address\n");
+                        HAL_INFO("[RTIMULib INFO]: Detected LSM9DS0 at option/standard address\n");
                         return true;
                     }
                 }
@@ -248,7 +248,7 @@ bool RTIMUSettings::discoverIMU(int& imuType, bool& busIsI2C, unsigned char& sla
                         imuType = RTIMU_TYPE_LSM9DS1;
                         slaveAddress = LSM9DS1_ADDRESS1;
                         busIsI2C = true;
-                        HAL_INFO("Detected LSM9DS1 at option/standard address\n");
+                        HAL_INFO("[RTIMULib INFO]: Detected LSM9DS1 at option/standard address\n");
                         return true;
                     }
                 }
@@ -257,7 +257,7 @@ bool RTIMUSettings::discoverIMU(int& imuType, bool& busIsI2C, unsigned char& sla
                         imuType = RTIMU_TYPE_LSM9DS1;
                         slaveAddress = LSM9DS1_ADDRESS1;
                         busIsI2C = true;
-                        HAL_INFO("Detected LSM9DS1 at option/option 1 address\n");
+                        HAL_INFO("[RTIMULib INFO]: Detected LSM9DS1 at option/option 1 address\n");
                         return true;
                     }
                 }
@@ -266,7 +266,7 @@ bool RTIMUSettings::discoverIMU(int& imuType, bool& busIsI2C, unsigned char& sla
                         imuType = RTIMU_TYPE_LSM9DS1;
                         slaveAddress = LSM9DS1_ADDRESS1;
                         busIsI2C = true;
-                        HAL_INFO("Detected LSM9DS1 at option/option 2 address\n");
+                        HAL_INFO("[RTIMULib INFO]: Detected LSM9DS1 at option/option 2 address\n");
                         return true;
                     }
                 }
@@ -275,7 +275,7 @@ bool RTIMUSettings::discoverIMU(int& imuType, bool& busIsI2C, unsigned char& sla
                         imuType = RTIMU_TYPE_LSM9DS1;
                         slaveAddress = LSM9DS1_ADDRESS1;
                         busIsI2C = true;
-                        HAL_INFO("Detected LSM9DS1 at option/option 3 address\n");
+                        HAL_INFO("[RTIMULib INFO]: Detected LSM9DS1 at option/option 3 address\n");
                         return true;
                     }
                 }
@@ -287,7 +287,7 @@ bool RTIMUSettings::discoverIMU(int& imuType, bool& busIsI2C, unsigned char& sla
                 imuType = RTIMU_TYPE_GD20M303DLHC;
                 slaveAddress = L3GD20_ADDRESS0;
                 busIsI2C = true;
-                HAL_INFO("Detected L3GD20 at standard address\n");
+                HAL_INFO("[RTIMULib INFO]: Detected L3GD20 at standard address\n");
                 return true;
             }
         }
@@ -297,7 +297,7 @@ bool RTIMUSettings::discoverIMU(int& imuType, bool& busIsI2C, unsigned char& sla
                 imuType = RTIMU_TYPE_GD20M303DLHC;
                 slaveAddress = L3GD20_ADDRESS1;
                 busIsI2C = true;
-                HAL_INFO("Detected L3GD20 at option address\n");
+                HAL_INFO("[RTIMULib INFO]: Detected L3GD20 at option address\n");
                 return true;
             }
         }
@@ -307,7 +307,7 @@ bool RTIMUSettings::discoverIMU(int& imuType, bool& busIsI2C, unsigned char& sla
                 imuType = RTIMU_TYPE_BMX055;
                 slaveAddress = BMX055_GYRO_ADDRESS0;
                 busIsI2C = true;
-                HAL_INFO("Detected BMX055 at standard address\n");
+                HAL_INFO("[RTIMULib INFO]: Detected BMX055 at standard address\n");
                 return true;
             }
         }
@@ -316,7 +316,7 @@ bool RTIMUSettings::discoverIMU(int& imuType, bool& busIsI2C, unsigned char& sla
                 imuType = RTIMU_TYPE_BMX055;
                 slaveAddress = BMX055_GYRO_ADDRESS1;
                 busIsI2C = true;
-                HAL_INFO("Detected BMX055 at option address\n");
+                HAL_INFO("[RTIMULib INFO]: Detected BMX055 at option address\n");
                 return true;
             }
         }
@@ -326,7 +326,7 @@ bool RTIMUSettings::discoverIMU(int& imuType, bool& busIsI2C, unsigned char& sla
                 imuType = RTIMU_TYPE_BNO055;
                 slaveAddress = BNO055_ADDRESS0;
                 busIsI2C = true;
-                HAL_INFO("Detected BNO055 at standard address\n");
+                HAL_INFO("[RTIMULib INFO]: Detected BNO055 at standard address\n");
                 return true;
             }
         }
@@ -336,7 +336,7 @@ bool RTIMUSettings::discoverIMU(int& imuType, bool& busIsI2C, unsigned char& sla
                 imuType = RTIMU_TYPE_BNO055;
                 slaveAddress = BNO055_ADDRESS1;
                 busIsI2C = true;
-                HAL_INFO("Detected BNO055 at option address\n");
+                HAL_INFO("[RTIMULib INFO]: Detected BNO055 at option address\n");
                 return true;
             }
         }
@@ -346,7 +346,7 @@ bool RTIMUSettings::discoverIMU(int& imuType, bool& busIsI2C, unsigned char& sla
                 imuType = RTIMU_TYPE_GY85;
                 slaveAddress = ADXL345_ADDRESS0;
                 busIsI2C = true;
-                HAL_INFO("Detected ADXL345 at standard address\n");
+                HAL_INFO("[RTIMULib INFO]: Detected ADXL345 at standard address\n");
                 return true;
             }
         }
@@ -366,7 +366,7 @@ bool RTIMUSettings::discoverIMU(int& imuType, bool& busIsI2C, unsigned char& sla
                 imuType = RTIMU_TYPE_MPU9250;
                 slaveAddress = MPU9250_ADDRESS0;
                 busIsI2C = false;
-                HAL_INFO("Detected MPU9250 on SPI bus 0, select 0\n");
+                HAL_INFO("[RTIMULib INFO]: Detected MPU9250 on SPI bus 0, select 0\n");
                 return true;
             }
         }
@@ -381,14 +381,14 @@ bool RTIMUSettings::discoverIMU(int& imuType, bool& busIsI2C, unsigned char& sla
                 imuType = RTIMU_TYPE_MPU9250;
                 slaveAddress = MPU9250_ADDRESS0;
                 busIsI2C = false;
-                HAL_INFO("Detected MPU9250 on SPI bus 0, select 1\n");
+                HAL_INFO("[RTIMULib INFO]: Detected MPU9250 on SPI bus 0, select 1\n");
                 return true;
             }
         }
         HALClose();
     }
 
-    HAL_ERROR("No IMU detected\n");
+    HAL_ERROR("[RTIMULib INFO]: No IMU detected\n");
     return false;
 }
 
@@ -404,7 +404,7 @@ bool RTIMUSettings::discoverPressure(int& pressureType, unsigned char& pressureA
             if (result == BMP180_ID) {
                 pressureType = RTPRESSURE_TYPE_BMP180;
                 pressureAddress = BMP180_ADDRESS;
-                HAL_INFO("Detected BMP180\n");
+                HAL_INFO("[RTIMULib INFO]: Detected BMP180\n");
                 return true;
             }
         }
@@ -413,7 +413,7 @@ bool RTIMUSettings::discoverPressure(int& pressureType, unsigned char& pressureA
             if (result == LPS25H_ID) {
                 pressureType = RTPRESSURE_TYPE_LPS25H;
                 pressureAddress = LPS25H_ADDRESS0;
-                HAL_INFO("Detected LPS25H at standard address\n");
+                HAL_INFO("[RTIMULib INFO]: Detected LPS25H at standard address\n");
                 return true;
             }
         }
@@ -422,7 +422,7 @@ bool RTIMUSettings::discoverPressure(int& pressureType, unsigned char& pressureA
             if (result == LPS25H_ID) {
                 pressureType = RTPRESSURE_TYPE_LPS25H;
                 pressureAddress = LPS25H_ADDRESS1;
-                HAL_INFO("Detected LPS25H at option address\n");
+                HAL_INFO("[RTIMULib INFO]: Detected LPS25H at option address\n");
                 return true;
             }
         }
@@ -432,17 +432,17 @@ bool RTIMUSettings::discoverPressure(int& pressureType, unsigned char& pressureA
         if (HALRead(MS5611_ADDRESS0, 0, 1, &result, "")) {
             pressureType = RTPRESSURE_TYPE_MS5611;
             pressureAddress = MS5611_ADDRESS0;
-            HAL_INFO("Detected MS5611 at standard address\n");
+            HAL_INFO("[RTIMULib INFO]: Detected MS5611 at standard address\n");
             return true;
         }
         if (HALRead(MS5611_ADDRESS1, 0, 1, &result, "")) {
             pressureType = RTPRESSURE_TYPE_MS5611;
             pressureAddress = MS5611_ADDRESS1;
-            HAL_INFO("Detected MS5611 at option address\n");
+            HAL_INFO("[RTIMULib INFO]: Detected MS5611 at option address\n");
             return true;
         }
     }
-    HAL_ERROR("No pressure sensor detected\n");
+    HAL_ERROR("[RTIMULib INFO]: No pressure sensor detected\n");
     return false;
 }
 
@@ -458,7 +458,7 @@ bool RTIMUSettings::discoverHumidity(int& humidityType, unsigned char& humidityA
             if (result == HTS221_ID) {
                 humidityType = RTHUMIDITY_TYPE_HTS221;
                 humidityAddress = HTS221_ADDRESS;
-                HAL_INFO("Detected HTS221 at standard address\n");
+                HAL_INFO("[RTIMULib INFO]: Detected HTS221 at standard address\n");
                 return true;
             }
         }
@@ -466,12 +466,12 @@ bool RTIMUSettings::discoverHumidity(int& humidityType, unsigned char& humidityA
         if (HALRead(HTU21D_ADDRESS, HTU21D_READ_USER_REG, 1, &result, "")) {
             humidityType = RTHUMIDITY_TYPE_HTU21D;
             humidityAddress = HTU21D_ADDRESS;
-            HAL_INFO("Detected HTU21D at standard address\n");
+            HAL_INFO("[RTIMULib INFO]: Detected HTU21D at standard address\n");
             return true;
         }
 
     }
-    HAL_ERROR("No humidity sensor detected\n");
+    HAL_ERROR("[RTIMULib INFO]: No humidity sensor detected\n");
     return false;
 }
 
@@ -627,7 +627,7 @@ bool RTIMUSettings::loadSettings()
     //  check to see if settings file exists
 
     if (!(m_fd = fopen(m_filename, "r"))) {
-        HAL_INFO("Settings file not found. Using defaults and creating settings file\n");
+        HAL_INFO("[RTIMULib INFO]: Settings file not found. Using defaults and creating settings file\n");
         return saveSettings();
     }
 
@@ -637,7 +637,7 @@ bool RTIMUSettings::loadSettings()
             continue;
 
         if (sscanf(buf, "%[^=]=%s", key, val) != 2) {
-            HAL_ERROR1("Bad line in settings file: %s\n", buf);
+            HAL_ERROR1("[RTIMULib INFO]: Bad line in settings file: %s\n", buf);
             fclose(m_fd);
             return false;
         }
@@ -938,10 +938,10 @@ bool RTIMUSettings::loadSettings()
         //  Handle unrecognized key
 
         } else {
-            HAL_ERROR1("Unrecognized key in settings file: %s\n", buf);
+            HAL_ERROR1("[RTIMULib INFO]: Unrecognized key in settings file: %s\n", buf);
         }
     }
-    HAL_INFO1("Settings file %s loaded\n", m_filename);
+    HAL_INFO1("[RTIMULib INFO]: Settings file %s loaded\n", m_filename);
     fclose(m_fd);
     return saveSettings();                                  // make sure settings file is correct and complete
 }
@@ -949,7 +949,7 @@ bool RTIMUSettings::loadSettings()
 bool RTIMUSettings::saveSettings()
 {
     if (!(m_fd = fopen(m_filename, "w"))) {
-        HAL_ERROR("Failed to open settings file for save");
+        HAL_ERROR("[RTIMULib INFO]: Failed to open settings file for save");
         return false;
     }
 

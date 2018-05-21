@@ -149,7 +149,7 @@ bool RTArduLinkHostNoQt::sendMessage(int port,
     message = &(portInfo->TXFrameBuffer.message);
 
 #ifdef RTARDULINKHOST_TRACE
-    std::cout << "Sending " << int(message->messageType) << " to port " <<
+    std::cout << "[RTIMULib INFO]: Sending " << int(message->messageType) << " to port " <<
         portInfo->index << " address " << messageAddress << '\n';
 #endif
 
@@ -220,7 +220,7 @@ void RTArduLinkHostNoQt::readyRead()
             charData = reinterpret_cast<unsigned char*>(const_cast<char*>(data.constData()));
             for (auto i = 0; i < data.length(); i++) {
                 if (!RTArduLinkReassemble(&(portInfo->RXFrame), *charData++))
-                    std::cout << "Reassembly error on port " << index << '\n';
+                    std::cout << "[RTIMULib INFO]: Reassembly error on port " << index << '\n';
                 if (portInfo->RXFrame.complete) {
                     processReceivedMessage(portInfo);
                     RTArduLinkRXFrameInit(&(portInfo->RXFrame), &(portInfo->RXFrameBuffer));
@@ -238,20 +238,20 @@ void RTArduLinkHostNoQt::processReceivedMessage(RTARDULINKHOST_PORT *portInfo)
 
     if ((portInfo->RXFrameBuffer.messageLength < RTARDULINK_MESSAGE_HEADER_LEN) ||
         (portInfo->RXFrameBuffer.messageLength > RTARDULINK_MESSAGE_MAX_LEN)) {
-        std::cout << "Received message with incorrect length " << portInfo->RXFrameBuffer.messageLength << '\n';
+        std::cout << "[RTIMULib INFO]: Received message with incorrect length " << portInfo->RXFrameBuffer.messageLength << '\n';
         return;
     }
 
     message = &(portInfo->RXFrameBuffer.message);           // get the message pointer
     address = RTArduLinkConvertUC2ToUInt(message->messageAddress);
     if (address == RTARDULINK_BROADCAST_ADDRESS) {
-        std::cout << "Received message with broadcast address" << '\n';
+        std::cout << "[RTIMULib INFO]: Received message with broadcast address" << '\n';
         return;
     }
     subsystem = m_subsystem[portInfo->index] + address;
 
 #ifdef RTARDULINKHOST_TRACE
-    std::cout << "Received " << (int)(message->messageType) << " from port " << portInfo->index << " address " << address << '\n';
+    std::cout << "[RTIMULib INFO]: Received " << (int)(message->messageType) << " from port " << portInfo->index << " address " << address << '\n';
 #endif
 
     switch (message->messageType)
@@ -260,7 +260,7 @@ void RTArduLinkHostNoQt::processReceivedMessage(RTARDULINKHOST_PORT *portInfo)
             subsystem->pollsIn++;
             if (!subsystem->active && (static_cast<int>(strlen(subsystem->identity)) > 0)) {
 #ifdef RTARDULINKHOST_TRACE
-                std::cout << "Subsystem port " << portInfo->index << " address " << address << '\n';
+                std::cout << "[RTIMULib INFO]: Subsystem port " << portInfo->index << " address " << address << '\n';
 #endif
                 subsystem->active = true;
                 subsystem->pollsIn = 0;
@@ -275,14 +275,14 @@ void RTArduLinkHostNoQt::processReceivedMessage(RTARDULINKHOST_PORT *portInfo)
             message->data[RTARDULINK_DATA_MAX_LEN - 1] = 0;	// make sure zero terminated
             strcpy(subsystem->identity, reinterpret_cast<const char *>(message->data));
 #ifdef RTARDULINKHOST_TRACE
-            std::cout << "Received identity " << subsystem->identity << '\n';
+            std::cout << "[RTIMULib INFO]: Received identity " << subsystem->identity << '\n';
 #endif
 
             break;
 
         case RTARDULINK_MESSAGE_DEBUG:
             message->data[RTARDULINK_DATA_MAX_LEN - 1] = 0;	// make sure zero terminated
-            std::cout << "Debug message from port " << portInfo->index << "address: " <<
+            std::cout << "[RTIMULib INFO]: Debug message from port " << portInfo->index << "address: " <<
                 address << ": " << reinterpret_cast<char *>(message->data) << '\n';
 
             break;
@@ -305,7 +305,7 @@ void RTArduLinkHostNoQt::sendIdentifyRequest()
         subsystem = m_subsystem[port];
         for (address = 0; address < RTARDULINK_ADDRESSES; address++, subsystem++) {
             if (subsystem->active && subsystem->waitingForIdentity) {
-                std::cout << "Subsystem " << subsystem->identity << "failed to re-identify" << '\n';
+                std::cout << "[RTIMULib INFO]: Subsystem " << subsystem->identity << "failed to re-identify" << '\n';
                 subsystem->active = false;
                 subsystem->identity[0] = 0;
             }
@@ -320,7 +320,7 @@ void RTArduLinkHostNoQt::sendIdentifyRequest()
         for (address = 0; address < RTARDULINK_ADDRESSES; address++, subsystem++)
             subsystem->waitingForIdentity = true;
     }
-    std::cout << "Sent identity request" << '\n';
+    std::cout << "[RTIMULib INFO]: Sent identity request" << '\n';
 }
 
 void RTArduLinkHostNoQt::sendPollRequest()
@@ -333,7 +333,7 @@ void RTArduLinkHostNoQt::sendPollRequest()
         subsystem = m_subsystem[port];
         for (address = 0; address < RTARDULINK_ADDRESSES; address++, subsystem++) {
             if (subsystem->active && subsystem->waitingForPoll) {
-                std::cout << "Subsystem " << subsystem->identity << "failed to respond to poll" << '\n';
+                std::cout << "[RTIMULib INFO]: Subsystem " << subsystem->identity << "failed to respond to poll" << '\n';
                 subsystem->active = false;
             }
         }

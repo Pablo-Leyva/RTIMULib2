@@ -61,13 +61,13 @@ void RTHostIMUNoQt::run()
 
         if (m_imu->IMURead())
         {
-            ROS_INFO_ONCE("IMU ready");
+            ROS_INFO_ONCE("%s ready", imcoder_name_.c_str());
             m_imuData = m_imu->getIMUData();
             pubData();
         }
         else
         {
-            ROS_WARN_ONCE("IMU not ready");
+            ROS_WARN_ONCE("%s ready", imcoder_name_.c_str());
         }
 
         update_rate_.sleep();
@@ -79,8 +79,12 @@ void RTHostIMUNoQt::newIMU()
 
     m_RTIMUsettings = new RTIMUSettings();
     m_imu = new RTHostIMUClientNoQt(m_RTIMUsettings);
+    static_cast<RTHostIMUClientNoQt*>(m_imu)->setSettingsPath(QString::fromStdString(path_to_settings_file_));
     m_imu->IMUInit();
     ROS_INFO("IMcoder initialized on port %s\n", m_settings->value(RTARDULINKHOST_SETTINGS_PORT).toString().toUtf8().constData());
+/*
+    RTHostIMUClientNoQt *a = new RTHostIMUClientNoQt(m_RTIMUsettings);
+    a->setSettingsPath();*/
 
 }
 
@@ -179,32 +183,36 @@ void RTHostIMUNoQt::pubData()
 bool RTHostIMUNoQt::ROSInit(ros::NodeHandle& nh, const ros::NodeHandle& private_nh)
 {
 
+    // Path to settings parameter
     if(!private_nh.getParam("path_to_settings_file", path_to_settings_file_))
     {
-        ROS_ERROR("No path_to_RTHostIMU_settings_file provided");
+        ROS_ERROR("No path_to_settings_file provided");
         return false;
     }
-    else
-    {
-        //m_path_to_settings_file = QString::fromStdString(path_to_settings_file_);
-    }
 
-    std::string imcoder_name;
-    if(!private_nh.getParam("imcoder_name", imcoder_name))
+    // IMcoder name parameter
+    if(!private_nh.getParam("imcoder_name", imcoder_name_))
     {
         ROS_WARN("No imcoder_name provided - default: imcoder99/imu_data");
-        imcoder_name = "imcoder99";
+        imcoder_name_ = "imcoder99";
     }
 
     // Serial port
-    std::string serial_port;
-    if(!private_nh.getParam("serial_port", serial_port))
+    if(!private_nh.getParam("serial_port", serial_port_))
     {
         ROS_ERROR("No serial_port provided");
         return false;
     }
 
-    // Publishing frame for IMU data
+    // @TODO: include serial baud rate
+    /*// Serial baud rate
+    if(!private_nh.getParam("serial_baud_rate", serial_baud_rate_))
+    {
+        ROS_ERROR("No serial_baud_rate provided");
+        return false;
+    }*/
+
+    // Frame id for publishers
     if(!private_nh.getParam("frame_id", frame_id_))
     {
         ROS_WARN("No frame_id provided - default: imu_link");
@@ -212,10 +220,10 @@ bool RTHostIMUNoQt::ROSInit(ros::NodeHandle& nh, const ros::NodeHandle& private_
     }
 
     // Initialize ROS publishers
-    imu_pub_            = nh.advertise<sensor_msgs::Imu>           ( imcoder_name + "/imu", 1);
-    mag_pub_            = nh.advertise<sensor_msgs::MagneticField> ( imcoder_name + "/mag", 1);
-    accel_marker_pub_   = nh.advertise<visualization_msgs::Marker> ( imcoder_name + "/imu_marker", 1);
-    compass_marker_pub_ = nh.advertise<visualization_msgs::Marker> ( imcoder_name + "/mag_marker", 1);
+    imu_pub_            = nh.advertise<sensor_msgs::Imu>           ( imcoder_name_ + "/imu", 1);
+    mag_pub_            = nh.advertise<sensor_msgs::MagneticField> ( imcoder_name_ + "/mag", 1);
+    accel_marker_pub_   = nh.advertise<visualization_msgs::Marker> ( imcoder_name_ + "/imu_marker", 1);
+    compass_marker_pub_ = nh.advertise<visualization_msgs::Marker> ( imcoder_name_ + "/mag_marker", 1);
 
     ROS_INFO("ROS initialization done");
 
@@ -225,24 +233,28 @@ bool RTHostIMUNoQt::ROSInit(ros::NodeHandle& nh, const ros::NodeHandle& private_
 
 void RTHostIMUNoQt::loadSettings()
 {
-    int speed;
-    int port;
-    QString portString;
+    // int speed;
+    // int port;
+    // QString portString;
 
     m_settings = new QSettings(QString::fromStdString(path_to_settings_file_), QSettings::IniFormat);
 
     // Check parameters and set them if they do not exist
     if (!m_settings->contains(RTARDULINKHOST_SETTINGS_PORT))
         m_settings->setValue(RTARDULINKHOST_SETTINGS_PORT, "Off");
+    else
+        m_settings->setValue(RTARDULINKHOST_SETTINGS_PORT, QString::fromStdString(serial_port_));
+
     if (!m_settings->contains(RTARDULINKHOST_SETTINGS_SPEED))
         m_settings->setValue(RTARDULINKHOST_SETTINGS_SPEED, 4);
+
     if (!m_settings->contains(RTARDULINKHOST_SETTINGS_MARKER_HISTORY_LIMIT))
         m_settings->setValue(RTARDULINKHOST_SETTINGS_MARKER_HISTORY_LIMIT, 100000);
 
     // Read parameters
-    portString            = m_settings->value(RTARDULINKHOST_SETTINGS_PORT).toString();
-    speed                 = m_settings->value(RTARDULINKHOST_SETTINGS_SPEED).toInt();
-    marker_history_limit_ = m_settings->value(RTARDULINKHOST_SETTINGS_MARKER_HISTORY_LIMIT).toInt();
+    // portString            = m_settings->value(RTARDULINKHOST_SETTINGS_PORT).toString();
+    // speed                 = m_settings->value(RTARDULINKHOST_SETTINGS_SPEED).toInt();
+    // marker_history_limit_ = m_settings->value(RTARDULINKHOST_SETTINGS_MARKER_HISTORY_LIMIT).toInt();
 
 }
 

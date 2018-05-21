@@ -163,7 +163,7 @@ RTIMU::RTIMU(RTIMUSettings *settings)
         m_fusion = new RTFusion();
         break;
     }
-    HAL_INFO1("Using fusion algorithm %s\n", RTFusion::fusionName(m_settings->m_fusionType));
+    HAL_INFO1("[RTIMULib INFO]: Using fusion algorithm %s\n", RTFusion::fusionName(m_settings->m_fusionType));
 }
 
 RTIMU::~RTIMU()
@@ -185,7 +185,7 @@ void RTIMU::setCalibrationData()
                 maxDelta = m_settings->m_compassCalMax.data(i) - m_settings->m_compassCalMin.data(i);
         }
         if (maxDelta < 0) {
-            HAL_ERROR("Error in compass calibration data\n");
+            HAL_ERROR("[RTIMULib ERROR]: Error in compass calibration data\n");
             return;
         }
         maxDelta /= 2.0f;                                       // this is the max +/- range
@@ -198,21 +198,21 @@ void RTIMU::setCalibrationData()
     }
 
     if (m_settings->m_compassCalValid) {
-        HAL_INFO("Using min/max compass calibration\n");
+        HAL_INFO("[RTIMULib INFO]: Using min/max compass calibration\n");
     } else {
-        HAL_INFO("min/max compass calibration not in use\n");
+        HAL_INFO("[RTIMULib INFO]: min/max compass calibration not in use\n");
     }
 
     if (m_settings->m_compassCalEllipsoidValid) {
-        HAL_INFO("Using ellipsoid compass calibration\n");
+        HAL_INFO("[RTIMULib INFO]: Using ellipsoid compass calibration\n");
     } else {
-        HAL_INFO("Ellipsoid compass calibration not in use\n");
+        HAL_INFO("[RTIMULib INFO]: Ellipsoid compass calibration not in use\n");
     }
 
     if (m_settings->m_accelCalValid) {
-        HAL_INFO("Using accel calibration\n");
+        HAL_INFO("[RTIMULib INFO]: Using accel calibration\n");
     } else {
-        HAL_INFO("Accel calibration not in use\n");
+        HAL_INFO("[RTIMULib INFO]: Accel calibration not in use\n");
     }
 }
 

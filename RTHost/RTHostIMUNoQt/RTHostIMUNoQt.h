@@ -107,6 +107,9 @@ private:
     ros::Publisher accel_marker_pub_;
     ros::Publisher compass_marker_pub_;
     std::string path_to_settings_file_;
+    std::string serial_port_;
+    std::string serial_baud_rate_;
+    std::string imcoder_name_;
 
     // Other parameters
     uint32_t marker_history_limit_;
